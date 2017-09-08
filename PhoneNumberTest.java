@@ -149,4 +149,11 @@ public class PhoneNumberTest
       assertThat(stringZeroesPhoneNum.toString(), containsString("(510) 024-0001"));
    }
 
+   @Test
+   public void testLettersToKeypadMapping()
+   {
+      PhoneNumber phoneNumber = new PhoneNumber("800-GET-HELP");
+      assertThat(phoneNumber.toString(), containsString("(800) 438-4357"));
+   }
+
 }
