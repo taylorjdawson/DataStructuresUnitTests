@@ -1,5 +1,6 @@
 import static org.junit.Assert.*;
 
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
@@ -9,19 +10,23 @@ public class BankAccountTest
 
    public static final String OWNERNAME = "Cool Guy Dude";
    public BankAccount myBankAccount = new BankAccount(OWNERNAME);
-   public ExpectedException exceptionGrabber = ExpectedException.none();
+   
+   @Rule
+   public final ExpectedException exceptionGrabber = ExpectedException.none();
    @Test
    public void testBankAccountCreatesSomething()
    {
       assertThat(myBankAccount, is(notNullValue()));
    }
    
+   @Test
    public void testBankAccountThrowsIllegalArgument()
    {
       // The exceptionGrabber I instantiate earlier matches an expected
       // exception with the thrown exception.
-      BankAccount throwIllegalArg = new BankAccount("");
       exceptionGrabber.expect(IllegalArgumentException.class);
+
+      BankAccount throwIllegalArg = new BankAccount(null);
    }
 
 
@@ -51,21 +56,48 @@ public class BankAccountTest
    @Test
    public void testMakeDeposit()
    {
-      fail("Not yet implemented"); // TODO
+      BankAccount foo = new BankAccount("Foo");
+      double depositAmt = 20.00;
+      foo.makeDeposit("-", depositAmt);
+      assertThat(foo.getCurrentBalance(), is(closeTo(depositAmt, 1.0E-7)));
    }
 
 
    @Test
-   public void testMakeWithdrawl()
+   public void testMakeWithdrawal()
    {
-      fail("Not yet implemented"); // TODO
+      BankAccount foo = new BankAccount("Foo");
+      double depositAmt = 20.00;
+      double withdrawalAmt = 10.00;
+      foo.makeDeposit("-", depositAmt);
+      foo.makeWithdrawal("+", withdrawalAmt);
+      assertThat(foo.getCurrentBalance(), is(closeTo(depositAmt-withdrawalAmt, 1.0E-7)));
+   }
+   
+   @Test
+   public void testMakeWithdrawalThrowsIllegalArg()
+   {
+      exceptionGrabber.expect(IllegalArgumentException.class);
+      myBankAccount.makeWithdrawal("should throw", -2.2);
    }
 
-
+   @Test
+   public void testMakeWithdrawalThrowsIllegalState()
+   {
+      BankAccount zeroBal = new BankAccount("no Balance");
+      exceptionGrabber.expect(IllegalStateException.class);
+      zeroBal.makeWithdrawal("should throw", 222222222222.0);
+   }
    @Test
    public void testGetCurrentStatement()
    {
-      fail("Not yet implemented"); // TODO
+      BankAccount statementExample = new BankAccount("David Hansen");
+      statementExample.makeDeposit("Direct Deposit", 1634.44);
+      statementExample.makeWithdrawal("Coffee Cottage", 6.22);
+      statementExample.makeDeposit("Deposit", 125.00);
+      
+      assertThat(statementExample.getCurrentStatement(), containsString("David Hansen"));
+      
    }
 
 }
